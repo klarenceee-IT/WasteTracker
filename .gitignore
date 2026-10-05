@@ -1,0 +1,16 @@
+# Visual Studio / Roslyn / MSBuild
+.vs/
+bin/
+obj/
+out/
+*.user
+*.userosscache
+*.sln.docstates
+
+# Android Build Outputs
+*.apk
+*.aab
+
+# macOS / OS File artifacts
+.DS_Store
+Thumbs.db

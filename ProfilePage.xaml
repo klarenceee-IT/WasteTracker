@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="WasteTracker.ProfilePage"
+             Title="Profile">
+    <ScrollView><VerticalStackLayout Padding="16" Spacing="14">
+        <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+            <Border WidthRequest="72" HeightRequest="72" StrokeShape="RoundRectangle 36" StrokeThickness="0" BackgroundColor="{StaticResource PrimaryLight}">
+                <Label x:Name="Initials" FontSize="26" FontAttributes="Bold" TextColor="{StaticResource Primary}" HorizontalOptions="Center" VerticalOptions="Center" />
+            </Border>
+            <Label x:Name="NameL" FontSize="18" FontAttributes="Bold" HorizontalTextAlignment="Center" />
+            <Label x:Name="EmailL" Style="{StaticResource Sub}" HorizontalTextAlignment="Center" />
+        </VerticalStackLayout>
+        <Border BackgroundColor="{StaticResource Primary}" StrokeThickness="0" StrokeShape="RoundRectangle 18" Padding="16">
+            <Grid ColumnDefinitions="*,Auto">
+                <VerticalStackLayout><Label Text="Green Points" TextColor="White" FontAttributes="Bold" />
+                    <Label Text="Keep recycling to earn more rewards" TextColor="#CFE8D8" FontSize="12" /></VerticalStackLayout>
+                <Label x:Name="PointsL" Grid.Column="1" TextColor="White" FontSize="22" FontAttributes="Bold" />
+            </Grid>
+        </Border>
+        <VerticalStackLayout x:Name="Menu" Spacing="8">
+            <BindableLayout.ItemTemplate><DataTemplate>
+                <Border Style="{StaticResource Card}">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Label Text="{Binding Icon}" FontSize="22" VerticalOptions="Center" />
+                        <VerticalStackLayout Grid.Column="1"><Label Text="{Binding Title}" FontAttributes="Bold" />
+                            <Label Text="{Binding Sub}" Style="{StaticResource Sub}" /></VerticalStackLayout>
+                        <Label Grid.Column="2" Text="›" FontSize="22" VerticalOptions="Center" />
+                    </Grid>
+                    <Border.GestureRecognizers><TapGestureRecognizer Tapped="Row_Tapped" /></Border.GestureRecognizers>
+                </Border>
+            </DataTemplate></BindableLayout.ItemTemplate>
+        </VerticalStackLayout>
+        <Button Text="Log Out" BackgroundColor="#FDECEC" TextColor="#C0392B" CornerRadius="14" HeightRequest="48" Clicked="Logout_Clicked" />
+    </VerticalStackLayout></ScrollView>
+</ContentPage>

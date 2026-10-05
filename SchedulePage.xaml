@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="WasteTracker.SchedulePage" BackgroundColor="White">
+    <ScrollView><VerticalStackLayout Padding="16" Spacing="14">
+        <Grid ColumnDefinitions="Auto,*,Auto">
+            <Button Text="←" Clicked="Back_Clicked" BackgroundColor="Transparent" TextColor="{StaticResource Ink}" FontSize="24" Padding="0" />
+            <Label Grid.Column="1" Text="Schedule Pickup" FontSize="20" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+        </Grid>
+        <Label Text="Select Date" FontAttributes="Bold" />
+        <Border Style="{StaticResource Card}"><VerticalStackLayout Spacing="8">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Button Text="‹" Clicked="Prev_Clicked" BackgroundColor="Transparent" TextColor="{StaticResource Ink}" FontSize="22" />
+                <Label x:Name="MonthL" Grid.Column="1" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+                <Button Grid.Column="2" Text="›" Clicked="Next_Clicked" BackgroundColor="Transparent" TextColor="{StaticResource Ink}" FontSize="22" />
+            </Grid>
+            <Grid x:Name="Cal" ColumnDefinitions="*,*,*,*,*,*,*" RowSpacing="4" />
+        </VerticalStackLayout></Border>
+        <Label Text="Select Time" FontAttributes="Bold" />
+        <Grid x:Name="Slots" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="8" RowSpacing="8" />
+        <Label Text="Address" FontAttributes="Bold" />
+        <Picker x:Name="AddrPicker" />
+        <Label Text="Notes (optional)" FontAttributes="Bold" />
+        <Editor x:Name="NotesE" Placeholder="e.g. Leave bags at the gate" HeightRequest="80" />
+        <Button Text="Confirm Schedule" Style="{StaticResource Cta}" Clicked="Confirm_Clicked" />
+    </VerticalStackLayout></ScrollView>
+</ContentPage>

@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="WasteTracker.WelcomePage"
+             BackgroundColor="{AppThemeBinding Light=#F4F6F8, Dark=#121212}"
+             Shell.NavBarIsVisible="False">
+
+    <ScrollView VerticalOptions="FillAndExpand">
+        <Grid VerticalOptions="Center" Padding="30">
+            <VerticalStackLayout Spacing="16" HorizontalOptions="Center" MaximumWidthRequest="320">
+
+                <!-- Centered Logo -->
+                <Image Source="app_logo.png"
+                       HeightRequest="110"
+                       WidthRequest="110"
+                       HorizontalOptions="Center"
+                       Aspect="AspectFit" />
+
+                <!-- Header Title & Subtitle -->
+                <Label Text="Welcome to WasteTracker"
+                       FontSize="24"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center"
+                       TextColor="{AppThemeBinding Light=#1B5E20, Dark=#81C784}" />
+
+                <Label x:Name="SubtitleLabel"
+                       Text="Sign in to manage eco-friendly waste tracking"
+                       FontSize="13"
+                       TextColor="Gray"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center" />
+
+                <!-- Input Fields -->
+                <VerticalStackLayout Spacing="12" Margin="0,10,0,0">
+                    
+                    <Entry x:Name="UsernameEntry"
+                           Placeholder="Username or Email"
+                           Keyboard="Email"
+                           ClearButtonVisibility="WhileEditing" />
+
+                    <Entry x:Name="PasswordEntry"
+                           Placeholder="Password"
+                           IsPassword="True" />
+
+                    <!-- Confirm Password Field (Only visible during Create Account) -->
+                    <Entry x:Name="ConfirmPasswordEntry"
+                           Placeholder="Confirm Password"
+                           IsPassword="True"
+                           IsVisible="False" />
+
+                </VerticalStackLayout>
+
+                <!-- Primary Action Button (Login by default) -->
+                <Button x:Name="PrimaryActionButton"
+                        Text="Login"
+                        Clicked="OnPrimaryActionButtonClicked"
+                        Margin="0,10,0,0"
+                        CornerRadius="8" />
+
+                <!-- Loading Indicator -->
+                <ActivityIndicator x:Name="LoadingIndicator"
+                                   IsRunning="False"
+                                   IsVisible="False"
+                                   HorizontalOptions="Center" />
+
+                <!-- Bottom Toggle Option -->
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="5" Margin="0,15,0,0">
+                    <Label x:Name="ToggleQuestionLabel"
+                           Text="Don't have an account?"
+                           FontSize="13"
+                           VerticalOptions="Center"
+                           TextColor="Gray" />
+
+                    <Button x:Name="ToggleButton"
+                            Text="Create Account"
+                            Clicked="OnToggleModeClicked"
+                            FontSize="13"
+                            FontAttributes="Bold"
+                            BackgroundColor="Transparent"
+                            TextColor="{AppThemeBinding Light=#1B5E20, Dark=#81C784}"
+                            Padding="0" />
+                </HorizontalStackLayout>
+
+            </VerticalStackLayout>
+        </Grid>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="WasteTracker.HomePage"
+             Title="Home">
+    <ScrollView><VerticalStackLayout Padding="16" Spacing="16">
+        <Grid ColumnDefinitions="*,Auto">
+            <VerticalStackLayout><Label x:Name="Hello" Style="{StaticResource H1}" />
+                <Label Text="Let's keep our environment clean" Style="{StaticResource Sub}" /></VerticalStackLayout>
+            <Label Grid.Column="1" Text="🔔" FontSize="24" />
+        </Grid>
+
+        <Border BackgroundColor="{StaticResource Primary}" StrokeThickness="0" Padding="18" StrokeShape="RoundRectangle 20">
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Total Waste Collected" TextColor="White" FontSize="13" />
+                <Label x:Name="Total" TextColor="White" FontSize="34" FontAttributes="Bold" />
+                <Label Text="This month" TextColor="#CFE8D8" FontSize="12" />
+            </VerticalStackLayout>
+        </Border>
+
+        <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="8">
+            <Button ClassId="schedule" Text="📅&#10;Schedule" Clicked="Quick_Clicked" />
+            <Button Grid.Column="1" ClassId="pickup" Text="🚚&#10;Pickup" Clicked="Quick_Clicked" />
+            <Button Grid.Column="2" ClassId="dropoff" Text="📍&#10;Drop Off" Clicked="Quick_Clicked" />
+            <Button Grid.Column="3" ClassId="tutorial" Text="🎓&#10;Tutorial" Clicked="Quick_Clicked" />
+        </Grid>
+
+        <Grid ColumnDefinitions="*,Auto">
+            <Label Text="Waste Categories" FontAttributes="Bold" FontSize="16" />
+            <Label Grid.Column="1" Text="See all" TextColor="{StaticResource Primary}">
+                <Label.GestureRecognizers><TapGestureRecognizer Tapped="SeeAll_Tapped" /></Label.GestureRecognizers>
+            </Label>
+        </Grid>
+        <FlexLayout x:Name="Cats" Wrap="Wrap" JustifyContent="SpaceBetween" AlignContent="Start">
+            <BindableLayout.ItemTemplate><DataTemplate>
+                <Border FlexLayout.Basis="31%" Margin="0,0,0,10" BackgroundColor="{Binding TintColor}" StrokeThickness="0"
+                        Padding="0,14" StrokeShape="RoundRectangle 16">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="{Binding Icon}" FontSize="28" HorizontalOptions="Center" />
+                        <Label Text="{Binding Name}" FontSize="12" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                    <Border.GestureRecognizers><TapGestureRecognizer Tapped="Cat_Tapped" /></Border.GestureRecognizers>
+                </Border>
+            </DataTemplate></BindableLayout.ItemTemplate>
+        </FlexLayout>
+
+        <Border Style="{StaticResource Card}">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                <Label Text="🚚" FontSize="26" />
+                <VerticalStackLayout Grid.Column="1"><Label Text="Next Collection" Style="{StaticResource Sub}" />
+                    <Label x:Name="NextL" FontAttributes="Bold" /></VerticalStackLayout>
+                <Label Grid.Column="2" Text="›" FontSize="24" />
+            </Grid>
+            <Border.GestureRecognizers><TapGestureRecognizer Tapped="Next_Tapped" /></Border.GestureRecognizers>
+        </Border>
+    </VerticalStackLayout></ScrollView>
+</ContentPage>

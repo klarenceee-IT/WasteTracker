@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="WasteTracker.CategoriesPage"
+             Title="Categories">
+    <Grid RowDefinitions="Auto,*,Auto" Padding="16" RowSpacing="12">
+        <Grid ColumnDefinitions="Auto,*,Auto">
+            <Button Text="←" Clicked="Back_Clicked" BackgroundColor="Transparent" TextColor="{StaticResource Ink}" FontSize="24" Padding="0" />
+            <Label Grid.Column="1" Text="Waste Categories" FontSize="20" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+        </Grid>
+        <CollectionView x:Name="List" Grid.Row="1" SelectionMode="Single" SelectionChanged="List_Selected">
+            <CollectionView.ItemTemplate><DataTemplate>
+                <Border Style="{StaticResource Card}" Margin="0,0,0,10">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
+                        <Border WidthRequest="46" HeightRequest="46" StrokeThickness="0" StrokeShape="RoundRectangle 23" BackgroundColor="{Binding TintColor}">
+                            <Label Text="{Binding Icon}" FontSize="22" HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                            <Label Text="{Binding Name}" FontAttributes="Bold" /><Label Text="{Binding Desc}" Style="{StaticResource Sub}" />
+                        </VerticalStackLayout>
+                        <Label Grid.Column="2" Text="›" FontSize="24" VerticalOptions="Center" />
+                    </Grid>
+                </Border>
+            </DataTemplate></CollectionView.ItemTemplate>
+        </CollectionView>
+        <Border Grid.Row="2" BackgroundColor="{StaticResource PrimaryLight}" StrokeThickness="0" StrokeShape="RoundRectangle 14" Padding="14">
+            <Label Text="🌱 Sort your waste correctly. Tap a category to log a drop-off and earn Green Points." FontSize="13" />
+        </Border>
+    </Grid>
+</ContentPage>

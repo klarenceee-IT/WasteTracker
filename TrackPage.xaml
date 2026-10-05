@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="WasteTracker.TrackPage" BackgroundColor="White">
+    <Grid RowDefinitions="Auto,*,Auto" Padding="16" RowSpacing="12">
+        <Grid ColumnDefinitions="Auto,*,Auto">
+            <Button Text="←" Clicked="Back_Clicked" BackgroundColor="Transparent" TextColor="{StaticResource Ink}" FontSize="24" Padding="0" />
+            <Label Grid.Column="1" Text="Track Pickup" FontSize="20" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+        </Grid>
+        <Grid Grid.Row="1">
+            <GraphicsView x:Name="MapView" />
+            <Border BackgroundColor="{StaticResource Primary}" StrokeThickness="0" StrokeShape="RoundRectangle 12" Padding="12,6"
+                    HorizontalOptions="End" VerticalOptions="Start" Margin="10">
+                <Label x:Name="EtaL" TextColor="White" FontSize="12" FontAttributes="Bold" />
+            </Border>
+        </Grid>
+        <Border Grid.Row="2" Style="{StaticResource Card}"><VerticalStackLayout Spacing="10">
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                <Label Text="🧑‍🔧" FontSize="30" />
+                <VerticalStackLayout Grid.Column="1"><Label Text="Budi Santoso" FontAttributes="Bold" />
+                    <Label Text="Waste Collection Driver" Style="{StaticResource Sub}" /></VerticalStackLayout>
+            </Grid>
+            <Label x:Name="StatusL" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
+            <Grid ColumnDefinitions="*,*,*">
+                <Label x:Name="S1" Text="● Assigned" FontSize="12" />
+                <Label x:Name="S2" Grid.Column="1" Text="● On the way" FontSize="12" HorizontalTextAlignment="Center" />
+                <Label x:Name="S3" Grid.Column="2" Text="● Arrived" FontSize="12" HorizontalTextAlignment="End" />
+            </Grid>
+        </VerticalStackLayout></Border>
+    </Grid>
+</ContentPage>

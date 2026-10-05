@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="WasteTracker.HistoryPage"
+             Title="History">
+    <Grid RowDefinitions="Auto,Auto,*" Padding="16" RowSpacing="10">
+        <Label Text="History" Style="{StaticResource H1}" />
+        <HorizontalStackLayout x:Name="Chips" Grid.Row="1" Spacing="6">
+            <Button Text="All" Clicked="Chip_Clicked" HeightRequest="36" FontSize="12" Padding="16,0" />
+            <Button Text="Pickup" Clicked="Chip_Clicked" HeightRequest="36" FontSize="12" Padding="16,0" />
+            <Button Text="Drop Off" Clicked="Chip_Clicked" HeightRequest="36" FontSize="12" Padding="16,0" />
+        </HorizontalStackLayout>
+        <CollectionView x:Name="List" Grid.Row="2">
+            <CollectionView.EmptyView><Label Text="Nothing here yet." HorizontalOptions="Center" /></CollectionView.EmptyView>
+            <CollectionView.ItemTemplate><DataTemplate>
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" Padding="0,8">
+                    <Border WidthRequest="44" HeightRequest="44" StrokeThickness="0" StrokeShape="RoundRectangle 12" BackgroundColor="{Binding TintColor}">
+                        <Label Text="{Binding Icon}" FontSize="22" HorizontalOptions="Center" VerticalOptions="Center" />
+                    </Border>
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center">
+                        <Label Text="{Binding Category}" FontAttributes="Bold" /><Label Text="{Binding Sub}" Style="{StaticResource Sub}" />
+                    </VerticalStackLayout>
+                    <Label Grid.Column="2" Text="{Binding KgText}" FontAttributes="Bold" VerticalOptions="Center" />
+                </Grid>
+            </DataTemplate></CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentPage>
