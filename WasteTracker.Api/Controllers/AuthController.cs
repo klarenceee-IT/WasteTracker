@@ -17,17 +17,34 @@ public class AuthController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
-        using var conn = new NpgsqlConnection(_connectionString);
-        await conn.OpenAsync();
+        if (request == null || string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrWhiteSpace(request.Password))
+        {
+            return BadRequest(new { message = "Invalid request payload." });
+        }
 
-        string query = @"INSERT INTO users (username, password) VALUES (@username, @password)";
+        try
+        {
+            using var conn = new NpgsqlConnection(_connectionString);
+            await conn.OpenAsync();
 
-        using var cmd = new NpgsqlCommand(query, conn);
-        cmd.Parameters.AddWithValue("username", request.Username);
-        cmd.Parameters.AddWithValue("password", request.Password);
+            string query = "INSERT INTO users (username, password_hash) VALUES (@username, @password)";
+            using var cmd = new NpgsqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("username", request.Username.Trim());
+            cmd.Parameters.AddWithValue("password", request.Password); // Consider hashing in production
 
-        await cmd.ExecuteNonQueryAsync();
-        return Ok(new { message = "User registered successfully!" });
+            await cmd.ExecuteNonQueryAsync();
+            return Ok(new { message = "User registered successfully." });
+        }
+        catch (PostgresException ex) when (ex.SqlState == "23505") // Unique violation code
+        {
+            return Conflict(new { message = "Username already exists." });
+        }
+        catch (Exception ex)
+        {
+            // Log backend exception to Render console
+            Console.WriteLine($"[BACKEND ERROR]: {ex}");
+            return StatusCode(500, new { message = $"Database error: {ex.Message}" });
+        }
     }
 
     [HttpPost("login")] // Resolves to /api/auth/login
