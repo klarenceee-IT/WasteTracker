@@ -1,51 +1,178 @@
-using Microsoft.Maui.ApplicationModel;
+using Microsoft.Maui.Controls.Maps;
+using Microsoft.Maui.Devices.Sensors;
+using Microsoft.Maui.Maps;
+
 namespace WasteTracker;
 
 public partial class MapPage : ContentPage
 {
-    readonly MapDrawable map = new();
-    List<DropSpot> shown = new();
-    string filter = "All";
-    int sel;
+    private bool _locationRequested;
 
-    public MapPage() { InitializeComponent(); MapView.Drawable = map; Apply(); }
-
-    void Apply()
+    public MapPage()
     {
-        Ui.Chips(Chips, filter);
-        var text = Search.Text ?? "";
-        shown = AppState.Spots.Where(s => (filter == "All" || s.Type == filter) && s.Name.Contains(text, StringComparison.OrdinalIgnoreCase)).ToList();
-        map.Pins = shown.Select(s => new PointF((float)s.X, (float)s.Y)).ToList();
-        sel = shown.Count > 0 ? 0 : -1;
-        Show();
+        InitializeComponent();
+
+        EcoMap.MapClicked += OnMapClicked;
     }
 
-    void Show()
+    protected override async void OnAppearing()
     {
-        Card.IsVisible = sel >= 0;
-        if (sel >= 0) { var s = shown[sel]; NameL.Text = s.Name; InfoL.Text = $"{s.Type} · {s.Km:0.0} km · {s.Hours}"; }
-        map.Selected = sel; MapView.Invalidate();
-    }
+        base.OnAppearing();
 
-    void Chip_Clicked(object? s, EventArgs e) { filter = ((Button)s!).Text; Apply(); }
-    void Search_Changed(object? s, TextChangedEventArgs e) => Apply();
-
-    void Map_Touch(object? s, TouchEventArgs e)
-    {
-        var t = e.Touches[0]; int best = -1; double bd = 40;
-        for (int i = 0; i < shown.Count; i++)
+        if (!_locationRequested)
         {
-            double d = Math.Sqrt(Math.Pow(shown[i].X * MapView.Width - t.X, 2) + Math.Pow(shown[i].Y * MapView.Height - t.Y, 2));
-            if (d < bd) { bd = d; best = i; }
+            _locationRequested = true;
+
+            await CenterMapOnCurrentLocationAsync();
         }
-        if (best >= 0) { sel = best; Show(); }
     }
 
-    async void Directions_Clicked(object? s, EventArgs e)
+    private async Task CenterMapOnCurrentLocationAsync()
     {
-        if (sel < 0) return;
-        var spot = shown[sel];
-        try { await Microsoft.Maui.ApplicationModel.Map.Default.OpenAsync(spot.Lat, spot.Lon, new MapLaunchOptions { Name = spot.Name }); }
-        catch (Exception) { await DisplayAlert("Directions", "No maps app available on this device.", "OK"); }
+        try
+        {
+            PermissionStatus permission =
+                await Permissions.RequestAsync<
+                    Permissions.LocationWhenInUse>();
+
+            if (permission != PermissionStatus.Granted)
+            {
+                MoveToDefaultLocation();
+
+                await DisplayAlert(
+                    "Location Permission",
+                    "Location permission was not granted. The map was opened at the default location.",
+                    "OK");
+
+                return;
+            }
+
+            Location? location =
+                await Geolocation.GetLastKnownLocationAsync();
+
+            if (location == null)
+            {
+                location =
+                    await Geolocation.GetLocationAsync(
+                        new GeolocationRequest(
+                            GeolocationAccuracy.Medium,
+                            TimeSpan.FromSeconds(10)));
+            }
+
+            if (location != null)
+            {
+                MapSpan span =
+                    MapSpan.FromCenterAndRadius(
+                        location,
+                        Distance.FromKilometers(2));
+
+                EcoMap.MoveToRegion(span);
+            }
+            else
+            {
+                MoveToDefaultLocation();
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine(
+                $"Map location error: {ex}");
+
+            MoveToDefaultLocation();
+        }
     }
+
+    private void MoveToDefaultLocation()
+    {
+        // Preserves the default location from your original app.
+        var location =
+            new Location(
+                9.7392,
+                118.7353);
+
+        var span =
+            MapSpan.FromCenterAndRadius(
+                location,
+                Distance.FromKilometers(5));
+
+        EcoMap.MoveToRegion(span);
+    }
+
+    private async void OnCenterLocationClicked(
+        object? sender,
+        EventArgs e)
+    {
+        await CenterMapOnCurrentLocationAsync();
+    }
+
+    private async void OnBackClicked(
+        object? sender,
+        EventArgs e)
+    {
+        await Shell.Current.GoToAsync("..");
+    }
+
+    private void OnMapClicked(
+        object? sender,
+        MapClickedEventArgs e)
+    {
+        System.Diagnostics.Debug.WriteLine(
+            $"Map clicked: {e.Location.Latitude}, {e.Location.Longitude}");
+    }
+
+    private async void OnPinMarkerClicked(
+    object? sender,
+    PinClickedEventArgs e)
+    {
+        if (sender is not Pin pin)
+            return;
+
+        e.HideInfoWindow = false;
+
+        bool navigate = await DisplayAlertAsync(
+            pin.Label,
+            pin.Address ?? "Open directions to this location?",
+            "Directions",
+            "Cancel");
+
+        if (!navigate)
+            return;
+
+        try
+        {
+            await Microsoft.Maui.ApplicationModel.Map.Default.OpenAsync(
+                pin.Location,
+                new Microsoft.Maui.ApplicationModel.MapLaunchOptions
+                {
+                    Name = pin.Label,
+                    NavigationMode =
+                        Microsoft.Maui.ApplicationModel.NavigationMode.Driving
+                });
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlertAsync(
+                "Map Error",
+                ex.Message,
+                "OK");
+        }
+    }
+
+    public void AddDropOffPoint(
+    string name,
+    string address,
+    double latitude,
+    double longitude)
+{
+    var pin = new Pin
+    {
+        Label = name,
+        Address = address,
+        Location = new Location(latitude, longitude)
+    };
+
+    pin.MarkerClicked += OnPinMarkerClicked;
+
+    EcoMap.Pins.Add(pin);
+}
 }

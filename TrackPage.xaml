@@ -1,29 +1,180 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="WasteTracker.TrackPage" BackgroundColor="White">
-    <Grid RowDefinitions="Auto,*,Auto" Padding="16" RowSpacing="12">
+
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="WasteTracker.TrackPage"
+    BackgroundColor="#F7FAF8">
+
+    <Grid
+        RowDefinitions="Auto,*,Auto"
+        Padding="18"
+        RowSpacing="14">
+
+        <!-- Header -->
         <Grid ColumnDefinitions="Auto,*,Auto">
-            <Button Text="←" Clicked="Back_Clicked" BackgroundColor="Transparent" TextColor="{StaticResource Ink}" FontSize="24" Padding="0" />
-            <Label Grid.Column="1" Text="Track Pickup" FontSize="20" FontAttributes="Bold" HorizontalTextAlignment="Center" VerticalOptions="Center" />
+
+            <Button
+                Text="‹"
+                Clicked="Back_Clicked"
+                BackgroundColor="Transparent"
+                TextColor="#17221B"
+                FontSize="34"
+                Padding="0"
+                WidthRequest="40" />
+
+            <Label
+                Grid.Column="1"
+                Text="Track Pickup"
+                FontSize="21"
+                FontAttributes="Bold"
+                HorizontalTextAlignment="Center"
+                VerticalOptions="Center"
+                TextColor="#17221B" />
+
+            <Label
+                Grid.Column="2"
+                Text="🚚"
+                FontSize="23"
+                VerticalOptions="Center" />
+
         </Grid>
-        <Grid Grid.Row="1">
-            <GraphicsView x:Name="MapView" />
-            <Border BackgroundColor="{StaticResource Primary}" StrokeThickness="0" StrokeShape="RoundRectangle 12" Padding="12,6"
-                    HorizontalOptions="End" VerticalOptions="Start" Margin="10">
-                <Label x:Name="EtaL" TextColor="White" FontSize="12" FontAttributes="Bold" />
-            </Border>
-        </Grid>
-        <Border Grid.Row="2" Style="{StaticResource Card}"><VerticalStackLayout Spacing="10">
-            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
-                <Label Text="🧑‍🔧" FontSize="30" />
-                <VerticalStackLayout Grid.Column="1"><Label Text="Budi Santoso" FontAttributes="Bold" />
-                    <Label Text="Waste Collection Driver" Style="{StaticResource Sub}" /></VerticalStackLayout>
+
+
+        <!-- Tracking Area -->
+        <Border
+            Grid.Row="1"
+            BackgroundColor="White"
+            Stroke="#E0E8E3"
+            StrokeThickness="1"
+            StrokeShape="RoundRectangle 22"
+            Padding="8">
+
+            <Grid>
+
+                <GraphicsView
+                    x:Name="MapView" />
+
+                <Border
+                    BackgroundColor="#2E7D4F"
+                    StrokeThickness="0"
+                    StrokeShape="RoundRectangle 15"
+                    Padding="12,7"
+                    HorizontalOptions="End"
+                    VerticalOptions="Start"
+                    Margin="10">
+
+                    <Label
+                        x:Name="EtaL"
+                        Text="Preparing..."
+                        TextColor="White"
+                        FontSize="12"
+                        FontAttributes="Bold" />
+
+                </Border>
+
             </Grid>
-            <Label x:Name="StatusL" FontAttributes="Bold" TextColor="{StaticResource Primary}" />
-            <Grid ColumnDefinitions="*,*,*">
-                <Label x:Name="S1" Text="● Assigned" FontSize="12" />
-                <Label x:Name="S2" Grid.Column="1" Text="● On the way" FontSize="12" HorizontalTextAlignment="Center" />
-                <Label x:Name="S3" Grid.Column="2" Text="● Arrived" FontSize="12" HorizontalTextAlignment="End" />
-            </Grid>
-        </VerticalStackLayout></Border>
+
+        </Border>
+
+
+        <!-- Information -->
+        <Border
+            Grid.Row="2"
+            BackgroundColor="White"
+            Stroke="#E0E8E3"
+            StrokeThickness="1"
+            StrokeShape="RoundRectangle 22"
+            Padding="16">
+
+            <VerticalStackLayout Spacing="12">
+
+                <Grid ColumnDefinitions="Auto,*">
+
+                    <Border
+                        WidthRequest="48"
+                        HeightRequest="48"
+                        BackgroundColor="#E7F4EB"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 16">
+
+                        <Label
+                            Text="🚚"
+                            FontSize="24"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center" />
+
+                    </Border>
+
+                    <VerticalStackLayout
+                        Grid.Column="1"
+                        Margin="12,0,0,0"
+                        VerticalOptions="Center">
+
+                        <Label
+                            Text="Waste Collection"
+                            FontAttributes="Bold"
+                            FontSize="15"
+                            TextColor="#17221B" />
+
+                        <Label
+                            Text="Driver: Budi Santoso"
+                            FontSize="11"
+                            TextColor="#718078" />
+
+                    </VerticalStackLayout>
+
+                </Grid>
+
+
+                <Label
+                    x:Name="StatusL"
+                    Text="Preparing pickup..."
+                    FontAttributes="Bold"
+                    FontSize="14"
+                    TextColor="#2E7D4F" />
+
+
+                <Grid ColumnDefinitions="*,*,*">
+
+                    <VerticalStackLayout>
+                        <Label
+                            x:Name="S1"
+                            Text="● Assigned"
+                            FontSize="11"
+                            TextColor="#2E7D4F" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout
+                        Grid.Column="1"
+                        HorizontalOptions="Center">
+
+                        <Label
+                            x:Name="S2"
+                            Text="● On the way"
+                            FontSize="11"
+                            TextColor="#9AA7A0" />
+
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout
+                        Grid.Column="2"
+                        HorizontalOptions="End">
+
+                        <Label
+                            x:Name="S3"
+                            Text="● Arrived"
+                            FontSize="11"
+                            TextColor="#9AA7A0" />
+
+                    </VerticalStackLayout>
+
+                </Grid>
+
+            </VerticalStackLayout>
+
+        </Border>
+
     </Grid>
+
 </ContentPage>

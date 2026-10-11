@@ -1,24 +1,85 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui" xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" x:Class="WasteTracker.MapPage" BackgroundColor="White">
-    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="16" RowSpacing="10">
-        <Label Text="Drop Off Locations" Style="{StaticResource H1}" />
-        <VerticalStackLayout Grid.Row="1" Spacing="6">
-            <SearchBar x:Name="Search" Placeholder="Search location..." TextChanged="Search_Changed" />
-            <HorizontalStackLayout x:Name="Chips" Spacing="6">
-                <Button Text="All" Clicked="Chip_Clicked" HeightRequest="34" FontSize="12" Padding="14,0" />
-                <Button Text="Recycling Center" Clicked="Chip_Clicked" HeightRequest="34" FontSize="12" Padding="14,0" />
-                <Button Text="TPS" Clicked="Chip_Clicked" HeightRequest="34" FontSize="12" Padding="14,0" />
-                <Button Text="E-Waste" Clicked="Chip_Clicked" HeightRequest="34" FontSize="12" Padding="14,0" />
-            </HorizontalStackLayout>
-        </VerticalStackLayout>
-        <GraphicsView x:Name="MapView" Grid.Row="2" StartInteraction="Map_Touch" />
-        <Border x:Name="Card" Grid.Row="3" Style="{StaticResource Card}">
-            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
-                <VerticalStackLayout VerticalOptions="Center">
-                    <Label x:Name="NameL" FontAttributes="Bold" /><Label x:Name="InfoL" Style="{StaticResource Sub}" />
-                </VerticalStackLayout>
-                <Button Grid.Column="1" Text="Get Directions" Style="{StaticResource Cta}" HeightRequest="42" FontSize="13" Clicked="Directions_Clicked" />
-            </Grid>
+
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:maps="http://schemas.microsoft.com/dotnet/2021/maui/maps"
+    x:Class="WasteTracker.MapPage"
+    Title="Eco Drop-off Map"
+    BackgroundColor="#F7FAF8">
+
+    <Grid>
+
+        <!-- Real Google/MAUI Map -->
+        <maps:Map
+            x:Name="EcoMap"
+            MapType="Street"
+            IsShowingUser="True" />
+
+
+        <!-- Top information card -->
+        <Border
+            HorizontalOptions="Center"
+            VerticalOptions="Start"
+            Margin="18"
+            BackgroundColor="White"
+            Stroke="#E0E8E3"
+            StrokeThickness="1"
+            StrokeShape="RoundRectangle 18"
+            Padding="16">
+
+            <VerticalStackLayout
+                Spacing="3"
+                HorizontalOptions="Center">
+
+                <Label
+                    Text="📍 Eco Drop-off Map"
+                    FontSize="16"
+                    FontAttributes="Bold"
+                    TextColor="#17221B"
+                    HorizontalTextAlignment="Center" />
+
+                <Label
+                    Text="Find recycling and waste drop-off locations"
+                    FontSize="11"
+                    TextColor="#718078"
+                    HorizontalTextAlignment="Center" />
+
+            </VerticalStackLayout>
+
         </Border>
+
+
+        <!-- Bottom controls -->
+        <VerticalStackLayout
+            HorizontalOptions="End"
+            VerticalOptions="End"
+            Margin="18"
+            Spacing="10">
+
+            <Button
+                Text="◎"
+                Clicked="OnCenterLocationClicked"
+                WidthRequest="52"
+                HeightRequest="52"
+                CornerRadius="26"
+                BackgroundColor="White"
+                TextColor="#2E7D4F"
+                FontSize="25"
+                Padding="0" />
+
+            <Button
+                Text="Back"
+                Clicked="OnBackClicked"
+                HeightRequest="45"
+                CornerRadius="15"
+                BackgroundColor="#2E7D4F"
+                TextColor="White"
+                FontAttributes="Bold"
+                Padding="18,0" />
+
+        </VerticalStackLayout>
+
     </Grid>
+
 </ContentPage>

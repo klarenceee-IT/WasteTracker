@@ -1,59 +1,312 @@
+using Microsoft.Maui.Graphics;
+
 namespace WasteTracker;
 
 public partial class TrackPage : ContentPage
 {
-    static readonly PointF[] Path = { new(.85f, .15f), new(.85f, .5f), new(.5f, .5f), new(.5f, .85f), new(.15f, .85f) };
-    readonly MapDrawable map = new();
-    float t; bool running;
+    private static readonly PointF[] Route =
+    {
+        new(0.85f, 0.15f),
+        new(0.85f, 0.45f),
+        new(0.55f, 0.45f),
+        new(0.55f, 0.75f),
+        new(0.20f, 0.75f)
+    };
+
+    private readonly TrackingDrawable _drawable = new();
+
+    private float _progress;
+    private bool _running;
 
     public TrackPage()
     {
         InitializeComponent();
-        map.Route = Path.ToList(); map.Home = Path[^1]; map.Truck = Path[0];
-        MapView.Drawable = map;
-        Refresh();
+
+        _drawable.Route = Route.ToList();
+        _drawable.Home = Route[^1];
+        _drawable.Truck = Route[0];
+
+        MapView.Drawable = _drawable;
+
+        RefreshTrackingUI();
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        t = 0; running = true; Refresh();
-        Dispatcher.StartTimer(TimeSpan.FromSeconds(1), () =>
-        {
-            if (!running) return false;
-            t = Math.Min(1, t + 1f / 24f); // demo speed: ~24 s for the 12-minute trip
-            map.Truck = At(t); MapView.Invalidate(); Refresh();
-            return t < 1;
-        });
-    }
 
-    protected override void OnDisappearing() { base.OnDisappearing(); running = false; }
+        _progress = 0;
+        _running = true;
 
-    static PointF At(float t)
-    {
-        var len = new float[Path.Length - 1]; float total = 0;
-        for (int i = 0; i < len.Length; i++) { len[i] = MathF.Sqrt(MathF.Pow(Path[i + 1].X - Path[i].X, 2) + MathF.Pow(Path[i + 1].Y - Path[i].Y, 2)); total += len[i]; }
-        float d = t * total;
-        for (int i = 0; i < len.Length; i++)
-        {
-            if (d <= len[i] || i == len.Length - 1)
+        RefreshTrackingUI();
+
+        Dispatcher.StartTimer(
+            TimeSpan.FromSeconds(1),
+            () =>
             {
-                float k = len[i] == 0 ? 1 : Math.Min(1, d / len[i]);
-                return new PointF(Path[i].X + (Path[i + 1].X - Path[i].X) * k, Path[i].Y + (Path[i + 1].Y - Path[i].Y) * k);
-            }
-            d -= len[i];
-        }
-        return Path[^1];
+                if (!_running)
+                    return false;
+
+                _progress =
+                    Math.Min(
+                        1f,
+                        _progress + 1f / 24f);
+
+                _drawable.Truck =
+                    GetPointAlongRoute(_progress);
+
+                MapView.Invalidate();
+
+                RefreshTrackingUI();
+
+                return _progress < 1f;
+            });
     }
 
-    void Refresh()
+    protected override void OnDisappearing()
     {
-        bool arrived = t >= 1;
-        EtaL.Text = arrived ? "Arrived" : $"Arriving in {(int)Math.Ceiling(12 * (1 - t))} min";
-        StatusL.Text = arrived ? "Driver has arrived at your address" : "On the way to your address";
-        var on = Color.FromArgb("#2E7D4F"); var off = Color.FromArgb("#9AA7A0");
-        S1.TextColor = on; S2.TextColor = on; S3.TextColor = arrived ? on : off;
+        base.OnDisappearing();
+
+        _running = false;
     }
 
-    async void Back_Clicked(object? s, EventArgs e) => await Shell.Current.GoToAsync("..");
+    private static PointF GetPointAlongRoute(float progress)
+    {
+        if (progress <= 0)
+            return Route[0];
+
+        if (progress >= 1)
+            return Route[^1];
+
+        float[] lengths =
+            new float[Route.Length - 1];
+
+        float totalLength = 0;
+
+        for (int i = 0; i < lengths.Length; i++)
+        {
+            float dx =
+                Route[i + 1].X - Route[i].X;
+
+            float dy =
+                Route[i + 1].Y - Route[i].Y;
+
+            lengths[i] =
+                MathF.Sqrt(dx * dx + dy * dy);
+
+            totalLength += lengths[i];
+        }
+
+        float distance =
+            progress * totalLength;
+
+        for (int i = 0; i < lengths.Length; i++)
+        {
+            if (distance <= lengths[i])
+            {
+                float ratio =
+                    lengths[i] <= 0
+                        ? 0
+                        : distance / lengths[i];
+
+                return new PointF(
+                    Route[i].X +
+                    (Route[i + 1].X - Route[i].X) * ratio,
+
+                    Route[i].Y +
+                    (Route[i + 1].Y - Route[i].Y) * ratio);
+            }
+
+            distance -= lengths[i];
+        }
+
+        return Route[^1];
+    }
+
+    private void RefreshTrackingUI()
+    {
+        bool arrived = _progress >= 1f;
+
+        if (arrived)
+        {
+            EtaL.Text = "Arrived";
+            StatusL.Text =
+                "Driver has arrived at your address.";
+
+            S1.TextColor =
+                Color.FromArgb("#2E7D4F");
+
+            S2.TextColor =
+                Color.FromArgb("#2E7D4F");
+
+            S3.TextColor =
+                Color.FromArgb("#2E7D4F");
+
+            return;
+        }
+
+        int minutes =
+            Math.Max(
+                1,
+                (int)Math.Ceiling(
+                    12 * (1 - _progress)));
+
+        EtaL.Text =
+            $"Arriving in {minutes} min";
+
+        StatusL.Text =
+            "Your waste collection vehicle is on the way.";
+
+        S1.TextColor =
+            Color.FromArgb("#2E7D4F");
+
+        S2.TextColor =
+            _progress > 0.02f
+                ? Color.FromArgb("#2E7D4F")
+                : Color.FromArgb("#9AA7A0");
+
+        S3.TextColor =
+            Color.FromArgb("#9AA7A0");
+    }
+
+    private async void Back_Clicked(
+        object? sender,
+        EventArgs e)
+    {
+        _running = false;
+
+        await Shell.Current.GoToAsync("..");
+    }
+}
+
+
+public sealed class TrackingDrawable : IDrawable
+{
+    public List<PointF> Route { get; set; } = new();
+
+    public PointF Home { get; set; }
+
+    public PointF Truck { get; set; }
+
+    public void Draw(
+        ICanvas canvas,
+        RectF dirtyRect)
+    {
+        float width = dirtyRect.Width;
+        float height = dirtyRect.Height;
+
+        if (width <= 0 || height <= 0)
+            return;
+
+        canvas.FillColor =
+            Color.FromArgb("#F5FAF6");
+
+        canvas.FillRectangle(
+            0,
+            0,
+            width,
+            height);
+
+        if (Route.Count < 2)
+            return;
+
+        PointF ToScreen(PointF point)
+        {
+            return new PointF(
+                point.X * width,
+                point.Y * height);
+        }
+
+        // Route
+        canvas.StrokeColor =
+            Color.FromArgb("#B9DEC5");
+
+        canvas.StrokeSize = 12;
+
+        for (int i = 0; i < Route.Count - 1; i++)
+        {
+            canvas.DrawLine(
+                ToScreen(Route[i]),
+                ToScreen(Route[i + 1]));
+        }
+
+        // Inner route
+        canvas.StrokeColor =
+            Color.FromArgb("#2E7D4F");
+
+        canvas.StrokeSize = 4;
+
+        for (int i = 0; i < Route.Count - 1; i++)
+        {
+            canvas.DrawLine(
+                ToScreen(Route[i]),
+                ToScreen(Route[i + 1]));
+        }
+
+        // Home marker
+        PointF home =
+            ToScreen(Home);
+
+        canvas.FillColor =
+            Color.FromArgb("#1F5D38");
+
+        canvas.FillCircle(
+            home.X,
+            home.Y,
+            13);
+
+        canvas.FillColor =
+            Colors.White;
+
+        canvas.FillCircle(
+            home.X,
+            home.Y,
+            5);
+
+        // Truck
+        PointF truck =
+            ToScreen(Truck);
+
+        canvas.FillColor =
+            Color.FromArgb("#2E7D4F");
+
+        canvas.FillRoundedRectangle(
+            truck.X - 17,
+            truck.Y - 12,
+            30,
+            21,
+            5);
+
+        canvas.FillColor =
+            Color.FromArgb("#66A87E");
+
+        canvas.FillRoundedRectangle(
+            truck.X + 9,
+            truck.Y - 7,
+            13,
+            16,
+            4);
+
+        canvas.FillColor =
+            Color.FromArgb("#25342B");
+
+        canvas.FillCircle(
+            truck.X - 8,
+            truck.Y + 11,
+            4);
+
+        canvas.FillCircle(
+            truck.X + 14,
+            truck.Y + 11,
+            4);
+
+        canvas.FillColor =
+            Colors.White;
+
+        canvas.FillRectangle(
+            truck.X + 12,
+            truck.Y - 4,
+            7,
+            6);
+    }
 }

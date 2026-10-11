@@ -1,88 +1,293 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="WasteTracker.WelcomePage"
-             BackgroundColor="{AppThemeBinding Light=#F4F6F8, Dark=#121212}"
-             Shell.NavBarIsVisible="False">
 
-    <ScrollView VerticalOptions="FillAndExpand">
-        <Grid VerticalOptions="Center" Padding="30">
-            <VerticalStackLayout Spacing="16" HorizontalOptions="Center" MaximumWidthRequest="320">
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="WasteTracker.WelcomePage"
+    BackgroundColor="#F5F9F6">
 
-                <!-- Centered Logo -->
-                <Image Source="app_logo.png"
-                       HeightRequest="110"
-                       WidthRequest="110"
-                       HorizontalOptions="Center"
-                       Aspect="AspectFit" />
+    <ScrollView>
+        <Grid
+            Padding="24,36"
+            RowDefinitions="Auto"
+            MinimumHeightRequest="650">
 
-                <!-- Header Title & Subtitle -->
-                <Label Text="Welcome to WasteTracker"
-                       FontSize="24"
-                       FontAttributes="Bold"
-                       HorizontalOptions="Center"
-                       HorizontalTextAlignment="Center"
-                       TextColor="{AppThemeBinding Light=#1B5E20, Dark=#81C784}" />
+            <VerticalStackLayout
+                Spacing="18"
+                MaximumWidthRequest="420"
+                HorizontalOptions="Center"
+                VerticalOptions="Center">
 
-                <Label x:Name="SubtitleLabel"
-                       Text="Sign in to manage eco-friendly waste tracking"
-                       FontSize="13"
-                       TextColor="Gray"
-                       HorizontalOptions="Center"
-                       HorizontalTextAlignment="Center" />
+                <!-- Branding -->
+                <VerticalStackLayout
+                    Spacing="8"
+                    HorizontalOptions="Center">
 
-                <!-- Input Fields -->
-                <VerticalStackLayout Spacing="12" Margin="0,10,0,0">
-                    
-                    <Entry x:Name="UsernameEntry"
-                           Placeholder="Username or Email"
-                           Keyboard="Email"
-                           ClearButtonVisibility="WhileEditing" />
+                    <Border
+                        BackgroundColor="#E1F2E6"
+                        WidthRequest="96"
+                        HeightRequest="96"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 30">
 
-                    <Entry x:Name="PasswordEntry"
-                           Placeholder="Password"
-                           IsPassword="True" />
+                        <Label
+                            Text="♻"
+                            FontSize="56"
+                            TextColor="#2E7D4F"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center" />
 
-                    <!-- Confirm Password Field (Only visible during Create Account) -->
-                    <Entry x:Name="ConfirmPasswordEntry"
-                           Placeholder="Confirm Password"
-                           IsPassword="True"
-                           IsVisible="False" />
+                    </Border>
+
+                    <Label
+                        Text="WasteTracker"
+                        FontSize="30"
+                        FontAttributes="Bold"
+                        TextColor="#1B5E35"
+                        HorizontalTextAlignment="Center" />
+
+                    <Label
+                        Text="Small actions. Greener future."
+                        FontSize="13"
+                        TextColor="#718078"
+                        HorizontalTextAlignment="Center" />
 
                 </VerticalStackLayout>
 
-                <!-- Primary Action Button (Login by default) -->
-                <Button x:Name="PrimaryActionButton"
-                        Text="Login"
-                        Clicked="OnPrimaryActionButtonClicked"
-                        Margin="0,10,0,0"
-                        CornerRadius="8" />
+                <!-- Authentication Card -->
+                <Border
+                    BackgroundColor="White"
+                    Stroke="#E0EAE3"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 24"
+                    Padding="20">
 
-                <!-- Loading Indicator -->
-                <ActivityIndicator x:Name="LoadingIndicator"
-                                   IsRunning="False"
-                                   IsVisible="False"
-                                   HorizontalOptions="Center" />
+                    <VerticalStackLayout Spacing="14">
 
-                <!-- Bottom Toggle Option -->
-                <HorizontalStackLayout HorizontalOptions="Center" Spacing="5" Margin="0,15,0,0">
-                    <Label x:Name="ToggleQuestionLabel"
-                           Text="Don't have an account?"
-                           FontSize="13"
-                           VerticalOptions="Center"
-                           TextColor="Gray" />
+                        <Label
+                            x:Name="FormTitleLabel"
+                            Text="Welcome Back!"
+                            FontSize="23"
+                            FontAttributes="Bold"
+                            TextColor="#17271C" />
 
-                    <Button x:Name="ToggleButton"
-                            Text="Create Account"
-                            Clicked="OnToggleModeClicked"
+                        <Label
+                            x:Name="SubtitleLabel"
+                            Text="Sign in to continue your eco journey."
+                            FontSize="12"
+                            TextColor="#748379" />
+
+                        <!-- Username -->
+                        <Label
+                            Text="Username"
                             FontSize="13"
                             FontAttributes="Bold"
-                            BackgroundColor="Transparent"
-                            TextColor="{AppThemeBinding Light=#1B5E20, Dark=#81C784}"
-                            Padding="0" />
-                </HorizontalStackLayout>
+                            TextColor="#34473B"
+                            Margin="0,8,0,0" />
+
+                        <Border
+                            BackgroundColor="#F7FAF8"
+                            Stroke="#E0EAE3"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 13"
+                            Padding="12,0">
+
+                            <Grid ColumnDefinitions="Auto,*"
+                                  ColumnSpacing="10">
+
+                                <Label
+                                    Text="👤"
+                                    FontSize="18"
+                                    VerticalOptions="Center" />
+
+                                <Entry
+                                    x:Name="UsernameEntry"
+                                    Grid.Column="1"
+                                    Placeholder="Enter your username"
+                                    Keyboard="Text"
+                                    ReturnType="Next"
+                                    ClearButtonVisibility="WhileEditing"
+                                    TextColor="#17271C"
+                                    PlaceholderColor="#97A49B"
+                                    BackgroundColor="Transparent" />
+
+                            </Grid>
+
+                        </Border>
+
+                        <!-- Password -->
+                        <Label
+                            Text="Password"
+                            FontSize="13"
+                            FontAttributes="Bold"
+                            TextColor="#34473B" />
+
+                        <Border
+                            BackgroundColor="#F7FAF8"
+                            Stroke="#E0EAE3"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 13"
+                            Padding="12,0">
+
+                            <Grid
+                                ColumnDefinitions="Auto,*,Auto"
+                                ColumnSpacing="8">
+
+                                <Label
+                                    Text="🔒"
+                                    FontSize="17"
+                                    VerticalOptions="Center" />
+
+                                <Entry
+                                    x:Name="PasswordEntry"
+                                    Grid.Column="1"
+                                    Placeholder="Enter your password"
+                                    IsPassword="True"
+                                    ReturnType="Done"
+                                    TextColor="#17271C"
+                                    PlaceholderColor="#97A49B"
+                                    BackgroundColor="Transparent" />
+
+                                <Button
+                                    x:Name="ShowPasswordButton"
+                                    Grid.Column="2"
+                                    Text="Show"
+                                    Clicked="OnShowPasswordClicked"
+                                    FontSize="12"
+                                    TextColor="#2E7D4F"
+                                    BackgroundColor="Transparent"
+                                    Padding="5,0" />
+
+                            </Grid>
+
+                        </Border>
+
+                        <!-- Confirm Password -->
+                        <VerticalStackLayout
+                            x:Name="ConfirmPasswordContainer"
+                            IsVisible="False"
+                            Spacing="7">
+
+                            <Label
+                                Text="Confirm Password"
+                                FontSize="13"
+                                FontAttributes="Bold"
+                                TextColor="#34473B" />
+
+                            <Border
+                                BackgroundColor="#F7FAF8"
+                                Stroke="#E0EAE3"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 13"
+                                Padding="12,0">
+
+                                <Entry
+                                    x:Name="ConfirmPasswordEntry"
+                                    Placeholder="Re-enter your password"
+                                    IsPassword="True"
+                                    TextColor="#17271C"
+                                    PlaceholderColor="#97A49B"
+                                    BackgroundColor="Transparent" />
+
+                            </Border>
+
+                        </VerticalStackLayout>
+
+                        <!-- Validation Message -->
+                        <Label
+                            x:Name="ErrorLabel"
+                            IsVisible="False"
+                            FontSize="12"
+                            TextColor="#C0392B"
+                            LineBreakMode="WordWrap" />
+
+                        <!-- Submit -->
+                        <Button
+                            x:Name="PrimaryActionButton"
+                            Text="Log In"
+                            Clicked="OnPrimaryActionButtonClicked"
+                            HeightRequest="52"
+                            CornerRadius="14"
+                            BackgroundColor="#2E7D4F"
+                            TextColor="White"
+                            FontSize="15"
+                            FontAttributes="Bold"
+                            Margin="0,7,0,0" />
+
+                        <!-- Loading -->
+                        <HorizontalStackLayout
+                            x:Name="LoadingContainer"
+                            IsVisible="False"
+                            HorizontalOptions="Center"
+                            Spacing="8">
+
+                            <ActivityIndicator
+                                x:Name="LoadingIndicator"
+                                Color="#2E7D4F"
+                                IsRunning="False"
+                                WidthRequest="20"
+                                HeightRequest="20" />
+
+                            <Label
+                                Text="Connecting to server..."
+                                FontSize="12"
+                                TextColor="#718078"
+                                VerticalOptions="Center" />
+
+                        </HorizontalStackLayout>
+
+                        <!-- Switch Mode -->
+                        <HorizontalStackLayout
+                            HorizontalOptions="Center"
+                            Spacing="3"
+                            Margin="0,8,0,0">
+
+                            <Label
+                                x:Name="ToggleQuestionLabel"
+                                Text="Don't have an account?"
+                                FontSize="12"
+                                TextColor="#718078"
+                                VerticalOptions="Center" />
+
+                            <Button
+                                x:Name="ToggleButton"
+                                Text="Sign Up"
+                                Clicked="OnToggleModeClicked"
+                                FontSize="12"
+                                FontAttributes="Bold"
+                                BackgroundColor="Transparent"
+                                TextColor="#2E7D4F"
+                                Padding="5,0" />
+
+                        </HorizontalStackLayout>
+
+                    </VerticalStackLayout>
+
+                </Border>
+
+                <!-- Footer -->
+                <VerticalStackLayout
+                    Spacing="5"
+                    HorizontalOptions="Center">
+
+                    <Label
+                        Text="🌱 Make every waste count."
+                        FontSize="13"
+                        FontAttributes="Bold"
+                        TextColor="#2E7D4F"
+                        HorizontalTextAlignment="Center" />
+
+                    <Label
+                        Text="Reduce • Reuse • Recycle"
+                        FontSize="11"
+                        TextColor="#8B9A90"
+                        HorizontalTextAlignment="Center" />
+
+                </VerticalStackLayout>
 
             </VerticalStackLayout>
+
         </Grid>
     </ScrollView>
+
 </ContentPage>

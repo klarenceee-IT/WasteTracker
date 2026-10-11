@@ -1,41 +1,108 @@
+
+using System;
+using Microsoft.Maui.Controls;
+using Microsoft.Maui.Storage;
+
 namespace WasteTracker;
 
 public partial class ProfilePage : ContentPage
 {
-    public ProfilePage() { InitializeComponent(); }
-    protected override void OnAppearing() { base.OnAppearing(); Refresh(); }
-
-    void Refresh()
+    public ProfilePage()
     {
-        var d = AppState.Data;
-        Initials.Text = string.Concat(d.Name.Split(' ').Take(2).Select(w => w[0]));
-        NameL.Text = d.Name; EmailL.Text = d.Email; PointsL.Text = $"{d.Points} pts";
-        BindableLayout.SetItemsSource(Menu, new[]
-        {
-            new MenuRow("📍", "My Address", d.Address),
-            new MenuRow("🔔", "Notifications", d.Notify ? "On — collection reminders, updates" : "Off"),
-            new MenuRow("💳", "Payment Method", "Manage your payment methods"),
-            new MenuRow("❓", "Help & Support", "FAQ, contact us"),
-            new MenuRow("ℹ️", "About", "App version 1.0.0"),
-        });
+        InitializeComponent();
     }
 
-    async void Row_Tapped(object? s, TappedEventArgs e)
+    protected override void OnAppearing()
     {
-        if (((BindableObject)s!).BindingContext is not MenuRow row) return;
-        switch (row.Title)
+        base.OnAppearing();
+
+        LoadUserProfile();
+    }
+
+    private void LoadUserProfile()
+    {
+        string username = AppState.Data.Name;
+
+        if (string.IsNullOrWhiteSpace(username))
         {
-            case "My Address":
-                var a = await DisplayPromptAsync("My Address", "Pickup address", "Save", "Cancel", initialValue: AppState.Data.Address);
-                if (!string.IsNullOrWhiteSpace(a)) { AppState.Data.Address = a.Trim(); AppState.Save(); }
-                break;
-            case "Notifications":
-                AppState.Data.Notify = !AppState.Data.Notify; AppState.Save(); break;
-            default:
-                await DisplayAlert(row.Title, "Coming soon.", "OK"); break;
+            username = Preferences.Get(
+                "LoggedInUsername",
+                "User");
         }
-        Refresh();
+
+        if (string.IsNullOrWhiteSpace(username))
+        {
+            username = "User";
+        }
+
+        // Username displayed at the top.
+        ProfileUsernameLabel.Text = username;
+
+        // Username displayed in the profile card.
+        NameL.Text = username;
+
+        // Display the first letter as the avatar.
+        Initials.Text = username.Length > 0
+            ? username[..1].ToUpperInvariant()
+            : "U";
+
+        // No email or points are supplied by the
+        // current authentication API.
+        EmailL.Text = "Email not provided";
+        PointsL.Text = "—";
     }
 
-    async void Logout_Clicked(object? s, EventArgs e) => await Shell.Current.GoToAsync("//welcome");
+    private async void Row_Tapped(
+        object? sender,
+        EventArgs e)
+    {
+        if (sender is Element element &&
+            element.BindingContext is MenuItem selectedItem)
+        {
+            await DisplayAlertAsync(
+                selectedItem.Title,
+                selectedItem.Sub,
+                "OK");
+        }
+    }
+
+    private async void Logout_Clicked(
+        object? sender,
+        EventArgs e)
+    {
+        bool confirm = await DisplayAlertAsync(
+            "Log Out",
+            "Are you sure you want to log out?",
+            "Yes",
+            "Cancel");
+
+        if (!confirm)
+            return;
+
+        // Clear local login information.
+        Preferences.Remove("AuthToken");
+        Preferences.Remove("LoggedInUsername");
+        Preferences.Remove("Username");
+
+        // Clear previous user's in-memory information.
+        AppState.Data = new UserData();
+
+        // Return to login.
+        var currentWindow = Window;
+
+        if (currentWindow != null)
+        {
+            currentWindow.Page = new WelcomePage();
+        }
+    }
+}
+
+// Keep this class only once in your project.
+public class MenuItem
+{
+    public string Icon { get; set; } = string.Empty;
+
+    public string Title { get; set; } = string.Empty;
+
+    public string Sub { get; set; } = string.Empty;
 }

@@ -3,11 +3,28 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="WasteTracker.App">
     <Application.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
-                <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
+        <Color x:Key="Primary">#2E7D4F</Color>
+        <Color x:Key="PrimaryLight">#E6F2EA</Color>
+        <Color x:Key="Ink">#1E2B24</Color>
+        <Color x:Key="Muted">#6C7A72</Color>
+        <Color x:Key="Line">#E3E8E5</Color>
+
+        <Style TargetType="Label"><Setter Property="TextColor" Value="{StaticResource Ink}" /></Style>
+        <Style x:Key="H1" TargetType="Label">
+            <Setter Property="FontSize" Value="24" /><Setter Property="FontAttributes" Value="Bold" />
+        </Style>
+        <Style x:Key="Sub" TargetType="Label">
+            <Setter Property="FontSize" Value="12" /><Setter Property="TextColor" Value="{StaticResource Muted}" />
+        </Style>
+        <Style x:Key="Card" TargetType="Border">
+            <Setter Property="Stroke" Value="{StaticResource Line}" /><Setter Property="StrokeThickness" Value="1" />
+            <Setter Property="BackgroundColor" Value="White" /><Setter Property="Padding" Value="12" />
+            <Setter Property="StrokeShape" Value="RoundRectangle 16" />
+        </Style>
+        <Style x:Key="Cta" TargetType="Button">
+            <Setter Property="BackgroundColor" Value="{StaticResource Primary}" /><Setter Property="TextColor" Value="White" />
+            <Setter Property="CornerRadius" Value="14" /><Setter Property="HeightRequest" Value="50" />
+            <Setter Property="FontAttributes" Value="Bold" />
+        </Style>
     </Application.Resources>
 </Application>
