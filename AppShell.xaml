@@ -13,7 +13,6 @@
 
     <TabBar>
 
-        <!-- HOME -->
         <Tab Title="Home" Icon="Resources/Images/home.png">
             <ShellContent
                 Title="Home"
@@ -21,7 +20,6 @@
                 ContentTemplate="{DataTemplate local:HomePage}" />
         </Tab>
 
-        <!-- MAP -->
         <Tab Title="Map" Icon="Resources/Images/map.png">
             <ShellContent
                 Title="Map"
@@ -29,7 +27,6 @@
                 ContentTemplate="{DataTemplate local:MapPage}" />
         </Tab>
 
-        <!-- CATEGORIES -->
         <Tab Title="Categories" Icon="Resources/Images/category.png">
             <ShellContent
                 Title="Categories"
@@ -37,7 +34,6 @@
                 ContentTemplate="{DataTemplate local:CategoriesPage}" />
         </Tab>
 
-        <!-- HISTORY -->
         <Tab Title="History" Icon="Resources/Images/history.png">
             <ShellContent
                 Title="History"
@@ -45,7 +41,6 @@
                 ContentTemplate="{DataTemplate local:HistoryPage}" />
         </Tab>
 
-        <!-- PROFILE -->
         <Tab Title="Profile" Icon="Resources/Images/user.png">
             <ShellContent
                 Title="Profile"

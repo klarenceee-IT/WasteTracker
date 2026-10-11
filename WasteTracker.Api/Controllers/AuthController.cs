@@ -5,32 +5,36 @@ namespace WasteTracker.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class WasteController : ControllerBase
+public class AuthController : ControllerBase
 {
     private readonly string _connectionString;
 
-    public WasteController(IConfiguration configuration)
+    public AuthController(IConfiguration configuration)
     {
         _connectionString = configuration.GetConnectionString("DefaultConnection")!;
     }
 
-    [HttpPost("log")]
-    public async Task<IActionResult> LogWaste([FromBody] WasteLogRequest request)
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterRequest request)
     {
         using var conn = new NpgsqlConnection(_connectionString);
         await conn.OpenAsync();
 
-        string query = @"INSERT INTO waste_logs (username, kg, category, created_at) 
-                        VALUES (@username, @kg, @category, @created_at)";
+        string query = @"INSERT INTO users (username, password) VALUES (@username, @password)";
 
         using var cmd = new NpgsqlCommand(query, conn);
         cmd.Parameters.AddWithValue("username", request.Username);
-        cmd.Parameters.AddWithValue("kg", request.Kg);
-        cmd.Parameters.AddWithValue("category", request.Category);
-        cmd.Parameters.AddWithValue("created_at", DateTime.UtcNow);
+        cmd.Parameters.AddWithValue("password", request.Password);
 
         await cmd.ExecuteNonQueryAsync();
-        return Ok(new { message = "Waste logged successfully!" });
+        return Ok(new { message = "User registered successfully!" });
+    }
+
+    [HttpPost("login")] // Resolves to /api/auth/login
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    {
+        // Login logic
+        return Ok(new { message = "Login successful" });
     }
 
     [HttpGet("history/{username}")]
@@ -58,6 +62,18 @@ public class WasteController : ControllerBase
 
         return Ok(logs);
     }
+}
+
+public class RegisterRequest
+{
+    public string Username { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+}
+
+public class LoginRequest
+{
+    public string Username { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 }
 
 public class WasteLogRequest

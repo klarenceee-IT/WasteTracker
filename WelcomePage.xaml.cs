@@ -188,22 +188,17 @@ public partial class WelcomePage : ContentPage
                 ? "/api/auth/register"
                 : "/api/auth/login";
 
-            string json = JsonSerializer.Serialize(
-                new
-                {
-                    username,
-                    password
-                });
+        
+            string json = JsonSerializer.Serialize(new { username, password });
 
             using var content = new StringContent(
                 json,
                 Encoding.UTF8,
                 "application/json");
 
-            using HttpResponseMessage response =
-                await _client.PostAsync(
-                    ApiBase + endpoint,
-                    content);
+            string requestUrl = $"{ApiBase.TrimEnd('/')}{endpoint}";
+
+            using HttpResponseMessage response = await _client.PostAsync(requestUrl, content);
 
             string responseText =
                 await response.Content.ReadAsStringAsync();
@@ -223,10 +218,10 @@ public partial class WelcomePage : ContentPage
                         "Username already exists. Please choose another username.");
                 }
                 else if (registering)
-                {
-                    ShowError(
-                        "Registration failed. Please check your details.");
-                }
+{
+    // Print exact HTTP Status Code & Server Response string
+    ShowError($"Registration failed (HTTP {(int)response.StatusCode}): {responseText}");
+}
                 else
                 {
                     ShowError(
@@ -258,7 +253,6 @@ public partial class WelcomePage : ContentPage
             }
 
             // Registration success:
-            // Return to login; do not open the dashboard.
             if (registering)
             {
                 await DisplayAlertAsync(
@@ -278,7 +272,6 @@ public partial class WelcomePage : ContentPage
             }
 
             // Login success:
-            // Only now save the username.
             AppState.Data = new UserData
             {
                 Name = username
@@ -292,10 +285,7 @@ public partial class WelcomePage : ContentPage
                 "Username",
                 username);
 
-            // Remove the old fake authentication token.
             Preferences.Remove("AuthToken");
-
-            // Prepare the dashboard before switching pages.
             
 try
 {
