@@ -10,82 +10,72 @@ namespace WasteTracker;
 
 public partial class HomePage : ContentPage
 {
+    private static readonly HttpClient _httpClient = new()
+    {
+        BaseAddress = new Uri("https://wastetracker-api.onrender.com")
+    };
     public HomePage()
     {
         InitializeComponent();
-
-        System.Diagnostics.Debug.WriteLine(
-            "HOME TEST: XAML loaded successfully.");
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
 
-        System.Diagnostics.Debug.WriteLine(
-            "HOME TEST: OnAppearing started.");
-
-        LoadHomeData();
+        Dispatcher.Dispatch(async () =>
+        {
+            await LoadHomePageDataAsync();
+        });
     }
 
-    private void LoadHomeData()
+    private async Task LoadHomePageDataAsync()
     {
         try
         {
-            string username = Preferences.Get(
-                "LoggedInUsername",
-                "User");
-
-            if (string.IsNullOrWhiteSpace(username))
+            // 1. Populate Waste Categories on the UI
+            if (Cats != null)
             {
-                username = "User";
+                BindableLayout.SetItemsSource(Cats, AppState.Types);
             }
 
-            WelcomeUserLabel.Text =
-                $"Welcome, {username}!";
+            string savedUsername = Preferences.Get("LoggedInUsername", Preferences.Get("Username", "User"));
 
-            System.Diagnostics.Debug.WriteLine(
-                "HOME TEST: Username loaded.");
+            if (WelcomeUserLabel != null)
+            {
+                WelcomeUserLabel.Text = savedUsername;
+            }
 
-            var userData = AppState.Data;
+            if (FindByName("Hello") is Label helloLabel)
+            {
+                helloLabel.Text = $"Hello, {savedUsername.Split(' ')[0]}";
+            }
 
-            DateTime today = DateTime.Today;
+            // 2. Fetch history from Render backend
+            HttpResponseMessage response = await _httpClient.GetAsync($"/api/waste/history/{savedUsername}");
 
-            double totalKg = userData.History
-                .Where(x =>
-                    x.Date.Year == today.Year &&
-                    x.Date.Month == today.Month)
-                .Sum(x => x.Kg);
+            if (response.IsSuccessStatusCode)
+            {
+                string json = await response.Content.ReadAsStringAsync();
+                var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                var logs = JsonSerializer.Deserialize<List<WasteLog>>(json, options);
 
-            Total.Text = $"{totalKg:0.#} kg";
+                if (logs != null)
+                {
+                    AppState.Data.History = logs;
 
-            System.Diagnostics.Debug.WriteLine(
-                "HOME TEST: Waste total loaded.");
+                    var now = DateTime.Today;
+                    double monthlyTotal = logs
+                        .Where(e => e.Date.Year == now.Year && e.Date.Month == now.Month)
+                        .Sum(e => e.Kg);
 
-            var pickup = userData.Next;
-
-            NextL.Text = pickup == null
-                ? "Nothing scheduled yet"
-                : $"{pickup.Date?.ToString("ddd, d MMM") ?? "No date"} · {pickup.Slot}";
-
-            System.Diagnostics.Debug.WriteLine(
-                "HOME TEST: Loading category cards.");
-
-            BindableLayout.SetItemsSource(
-                Cats,
-                AppState.Types);
-
-            System.Diagnostics.Debug.WriteLine(
-                "HOME TEST: Category cards loaded.");
-
+                    Total.Text = $"{monthlyTotal:0.#} kg";
+                }
+            }
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine(
-                $"HOME ERROR: {ex}");
-
-            WelcomeUserLabel.Text =
-                "Welcome to WasteTracker!";
+            System.Diagnostics.Debug.WriteLine($"Error loading home data: {ex.Message}");
         }
     }
 
@@ -170,30 +160,14 @@ public partial class HomePage : ContentPage
         }
     }
 
-    private async void Cat_Tapped(
-        object? sender,
-        TappedEventArgs e)
+    private async void Cat_Tapped(object? sender, TappedEventArgs e)
     {
-        if (sender is BindableObject element &&
-            element.BindingContext is WasteType wasteType)
+        if (sender is BindableObject bindable && bindable.BindingContext is WasteType wasteType)
         {
-            try
+            if (await AppState.PromptLog(this, wasteType))
             {
-                bool saved = await AppState.PromptLog(
-                    this,
-                    wasteType);
-
-                if (saved)
-                {
-                    LoadHomeData();
-                }
-            }
-            catch (Exception ex)
-            {
-                await DisplayAlertAsync(
-                    "Error",
-                    ex.Message,
-                    "OK");
+                // Refresh home page totals immediately after logging
+                await LoadHomePageDataAsync();
             }
         }
     }
@@ -261,41 +235,5 @@ public partial class HomePage : ContentPage
                 "OK");
         }
     }
-    private async Task LoadHomePageDataAsync()
-{
-    try
-    {
-        string savedUsername = Preferences.Get("LoggedInUsername", Preferences.Get("Username", "User"));
-
-        if (WelcomeUserLabel != null)
-        {
-            WelcomeUserLabel.Text = savedUsername;
-        }
-
-        // Fetch user history from Render backend API
-        using var client = new HttpClient();
-        var response = await client.GetAsync($"https://wastetracker-api.onrender.com/api/waste/history/{savedUsername}");
-
-        if (response.IsSuccessStatusCode)
-        {
-            var logs = await response.Content.ReadFromJsonAsync<List<WasteLog>>();
-            if (logs != null)
-            {
-                AppState.Data.History = logs;
-
-                var now = DateTime.Today;
-                double monthlyTotal = logs
-                    .Where(e => e.Date.Year == now.Year && e.Date.Month == now.Month)
-                    .Sum(e => e.Kg);
-
-                Total.Text = $"{monthlyTotal:0.#} kg";
-            }
-        }
-    }
-    catch (Exception ex)
-    {
-        System.Diagnostics.Debug.WriteLine($"Error fetching user history: {ex.Message}");
-    }
-}
 
 }

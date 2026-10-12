@@ -1,4 +1,7 @@
+using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
 using Microsoft.Maui.Storage;
 using Microsoft.Maui.Controls;
 namespace WasteTracker;
@@ -23,56 +26,63 @@ public class ScheduledPickup
     public string Slot { get; set; } = string.Empty;
 }
 
-public static class AppState
-{
-    public static List<WasteType> Types { get; set; } = new()
+    public static class AppState
     {
-        new WasteType("Recyclable", "♻️", "Green", "Recyclable materials"),
-        new WasteType("Organic", "🌱", "Brown", "Organic waste"),
-        new WasteType("Hazardous", "⚠️", "Red", "Hazardous waste"),
-        new WasteType("General Waste", "🗑️", "Gray", "General waste")
-    };
-
-    private static readonly HttpClient _httpClient = new()
-    {
-        BaseAddress = new Uri("https://wastetracker-api.onrender.com")
-    };
-
-    public static UserData? _data;
-    public static UserData Data
-    {
-        get
+        private static readonly HttpClient _httpClient = new()
         {
-            _data ??= new UserData();
-            string savedName = Preferences.Get("LoggedInUsername", Preferences.Get("Username", string.Empty));
-            if (!string.IsNullOrWhiteSpace(savedName) && savedName != "Eco Tracker")
-            {
-                _data.Name = savedName;
-            }
-            return _data;
-        }
-        set => _data = value;
-    }
+            BaseAddress = new Uri("https://wastetracker-api.onrender.com")
+        };
 
+        public static List<WasteType> Types { get; set; } = new()
+        {
+            new WasteType("Recyclable", "♻️", "Green", "Recyclable materials"),
+            new WasteType("Organic", "🌱", "Brown", "Organic waste"),
+            new WasteType("Hazardous", "⚠️", "Red", "Hazardous waste"),
+            new WasteType("General Waste", "🗑️", "Gray", "General waste")
+        };
+
+        public static UserData? _data;
+        public static UserData Data
+        {
+            get
+            {
+                if (_data == null)
+                {
+                    _data = new UserData();
+                }
+
+                string savedName = Preferences.Get("LoggedInUsername", Preferences.Get("Username", string.Empty));
+                if (!string.IsNullOrWhiteSpace(savedName) && savedName != "Eco Tracker")
+                {
+                    _data.Name = savedName;
+                }
+
+                return _data;
+            }
+            set => _data = value;
+        }
     public static async Task<bool> PromptLog(Page page, WasteType wasteType)
     {
         string result = await page.DisplayPromptAsync("Log Waste", $"Enter weight in Kg for {wasteType.Name}:", keyboard: Keyboard.Numeric);
         
-        if (double.TryParse(result, out double kg) && kg > 0)
-        {
-            string username = Preferences.Get("LoggedInUsername", Preferences.Get("Username", string.Empty));
+            if (double.TryParse(result, out double kg) && kg > 0)
+            {
+            double roundedKg = Math.Round(kg, 2);
 
             var logPayload = new
             {
-                Username = username,
-                Kg = kg,
-                Category = wasteType.Name
+                username = Data.Name,
+                kg = roundedKg,
+                category = wasteType.Name
             };
 
             try
             {
-                // Send log directly to Render database
-                var response = await _httpClient.PostAsJsonAsync("/api/waste/log", logPayload);
+                string json = JsonSerializer.Serialize(logPayload);
+                using var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                // Post directly to PostgreSQL backend
+                HttpResponseMessage response = await _httpClient.PostAsync("/api/waste/log", content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -83,13 +93,18 @@ public static class AppState
                         Category = wasteType.Name
                     });
 
-                    await page.DisplayAlert("Success", $"Logged {kg} kg of {wasteType.Name} to your account!", "OK");
+                    await page.DisplayAlert("Success", $"Logged {kg} kg of {wasteType.Name}!", "OK");
                     return true;
+                }
+                else
+                {
+                    string err = await response.Content.ReadAsStringAsync();
+                    await page.DisplayAlert("Error Logging Waste", string.IsNullOrWhiteSpace(err) ? "Server rejected the log entry." : err, "OK");
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[LOG ERROR]: {ex.Message}");
+                await page.DisplayAlert("Connection Error", $"Failed to post log: {ex.Message}", "OK");
             }
         }
         return false;
